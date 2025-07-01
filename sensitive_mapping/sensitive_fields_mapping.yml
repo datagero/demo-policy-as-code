@@ -1,0 +1,51 @@
+# sensitive_fields_mapping.yml
+# A central mapping between DBT column names and anonymisation tagging policy logic.
+# Used to drive inference and validation for column_security_role tagging across data products.
+_schema:
+  description: >
+    Free-text summary of what this field represents in business terms.
+  col_type: >
+    Canonical data type used to group columns under shared masking/anonymisation logic.
+    Examples: uk_post_cd, email, birth_date. This helps cluster fields that share anonymisation semantics.
+  sec_type: >
+    Security intent of the policy.
+    Use 'M' for full masking (default), or 'P' for partial anonymisation based on role visibility.
+  mask_policy: >
+    Final masking policy name to apply. If not provided, it will be inferred from col_type, sec_type, and role_name.
+  last_updated: >
+    ISO-style timestamp indicating the last manual update of this entry.
+fields:
+  customer_nm:
+    description: First name of the customer.
+    col_type: first_name
+    sec_type: M
+    mask_policy: FOO_PII_NAME
+    last_updated: 2025-06-12T00:00:00Z
+
+  dob_dt:
+    description: Date of birth of the customer.
+    col_type: birth_date
+    sec_type: P
+    mask_policy: FOO_PII_DOB
+    last_updated: 2025-06-12T00:00:00Z
+
+  age_ind:
+    description: Numeric age derived from DOB, may be inferred or masked along with birth_date.
+    col_type: birth_date
+    sec_type: P
+    mask_policy: FOO_PII_DOB
+    last_updated: 2025-06-12T00:00:00Z
+
+  age_str_ind:
+    description: Age as string for display or export; subject to same policy as DOB-derived fields.
+    col_type: birth_date
+    sec_type: P
+    mask_policy: FOO_PII_DOB
+    last_updated: 2025-06-12T00:00:00Z
+
+  post_cd:
+    description: Customer's primary postcode.
+    col_type: uk_post_cd
+    sec_type: P
+    mask_policy: FOO_PII_POSTCODE
+    last_updated: 2025-06-12T00:00:00Z

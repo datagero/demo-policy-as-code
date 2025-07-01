@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: b_it_integration_test_column_anonymization
+    description: "Test table containing sample customer data with sensitive tagging."
+    config:
+      tags:
+        - skip_naming_validation
+    columns:
+      - name: id
+        description: "Unique identifier for the customer."
+
+      - name: name
+        description: "Full name of the customer."
+        meta:
+          column_security_role: FOO_PII_NAME
+
+      - name: dob
+        description: "Date of birth of the customer."
+        meta:
+          column_security_role: FOO_PII_DOB
+
+      - name: age
+        description: "Age of the customer."
+        meta:
+          column_security_role: FOO_PII_DOB
+
+      - name: age_str
+        description: "Age as a string, to align with analytical masking policies display or export."
+        meta:
+          column_security_role: FOO_PII_DOB
+
+      - name: postcode
+        description: "Customer's primary postcode."
+        meta:
+          column_security_role: FOO_PII_POSTCODE

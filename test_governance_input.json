@@ -1,0 +1,29 @@
+{
+  "input": {
+    "mapping": {
+      "fields": {
+        "customer_nm": {
+          "description": "First name of the customer.",
+          "col_type": "first_name",
+          "sec_type": "M",
+          "mask_policy": "FOO_PII_NAME",
+          "last_updated": "2025-06-12T00:00:00Z"
+        },
+        "dob_dt": {
+          "description": "Date of birth of the customer.",
+          "col_type": "birth_date",
+          "sec_type": "P",
+          "mask_policy": "FOO_PII_DOB",
+          "last_updated": "2025-06-12T00:00:00Z"
+        },
+        "post_cd": {
+          "description": "Customer's primary postcode.",
+          "col_type": "uk_post_cd",
+          "sec_type": "P",
+          "mask_policy": "FOO_PII_POSTCODE",
+          "last_updated": "2025-06-12T00:00:00Z"
+        }
+      }
+    }
+  }
+} 

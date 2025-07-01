@@ -1,0 +1,32 @@
+{
+  "input": {
+    "schema": {
+      "models": [
+        {
+          "name": "customer_model",
+          "columns": [
+            {
+              "name": "customer_nm",
+              "column_security_role": "FOO_PII_NAME"
+            },
+            {
+              "name": "dob_dt",
+              "column_security_role": "FOO_PII_DOB"
+            },
+            {
+              "name": "post_cd",
+              "column_security_role": "FOO_PII_POSTCODE"
+            },
+            {
+              "name": "email_addr",
+              "column_security_role": "FOO_PII_EMAIL"
+            },
+            {
+              "name": "non_sensitive_field"
+            }
+          ]
+        }
+      ]
+    }
+  }
+} 

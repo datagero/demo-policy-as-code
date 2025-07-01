@@ -1,0 +1,50 @@
+{
+  "input": {
+    "schema": {
+      "models": [
+        {
+          "name": "b_it_integration_test_column_anonymization",
+          "description": "Test table containing sample customer data with sensitive tagging.",
+          "columns": [
+            {
+              "name": "id",
+              "description": "Unique identifier for the customer.",
+              "security_role": null,
+              "is_sensitive": false
+            },
+            {
+              "name": "name",
+              "description": "Full name of the customer.",
+              "security_role": "FOO_PII_NAME",
+              "is_sensitive": true
+            },
+            {
+              "name": "dob",
+              "description": "Date of birth of the customer.",
+              "security_role": "FOO_PII_DOB",
+              "is_sensitive": true
+            },
+            {
+              "name": "age",
+              "description": "Age of the customer.",
+              "security_role": "FOO_PII_DOB",
+              "is_sensitive": true
+            },
+            {
+              "name": "age_str",
+              "description": "Age as a string, to align with analytical masking policies display or export.",
+              "security_role": "FOO_PII_DOB",
+              "is_sensitive": true
+            },
+            {
+              "name": "postcode",
+              "description": "Customer's primary postcode.",
+              "security_role": "FOO_PII_POSTCODE",
+              "is_sensitive": true
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

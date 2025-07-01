@@ -1,0 +1,28 @@
+{
+  "input": {
+    "mapping": {
+      "fields": {
+        "fail_only": {
+          "description": "Should fail if not in schema.",
+          "col_type": "fail_type",
+          "sec_type": "M",
+          "mask_policy": "FOO_FAIL",
+          "last_updated": "2025-06-12T00:00:00Z"
+        }
+      }
+    },
+    "schema": {
+      "models": [
+        {
+          "name": "customer_model",
+          "columns": [
+            {
+              "name": "fail_only",
+              "column_security_role": "FOO_PII_NAME"
+            }
+          ]
+        }
+      ]
+    }
+  }
+} 
