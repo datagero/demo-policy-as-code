@@ -7,6 +7,7 @@ This guide explains how to deploy and run the Open Policy Agent (OPA) project in
 - Rancher Desktop or Rancher Server with access to a Kubernetes cluster
 - kubectl configured to access your cluster
 - The Kubernetes manifests in the `k8s/` directory
+- Helm (for installing the ConfigMap Reloader)
 
 ## Deployment Options
 
@@ -22,44 +23,47 @@ This guide explains how to deploy and run the Open Policy Agent (OPA) project in
    kubectl apply -k k8s/
    ```
 
-3. **Verify deployment:**
+3. **Install ConfigMap Reloader for seamless updates:**
+   ```bash
+   chmod +x install-reloader.sh
+   ./install-reloader.sh
+   ```
+
+4. **Verify deployment:**
    ```bash
    kubectl get all -n opa-policy
    kubectl get pods -n opa-policy
    ```
 
-4. **Access the service:**
+5. **Access the service:**
    ```bash
    # Port forward to access locally
    kubectl port-forward -n opa-policy svc/opa-service 8181:8181
    ```
 
-## Updating the OPA Policy
+## Updating the OPA Policy (Seamless)
 
-When you need to modify your policy rules, follow these steps:
+With the ConfigMap Reloader installed, policy updates are now **automatic** - no manual restarts needed!
 
-### Step 1: Edit Your Policy File
+### Method 1: Using the Update Script (Recommended)
 ```bash
-# Edit the access_policy.rego file with your changes
-# Example: Add new rules, modify existing logic, etc.
+chmod +x update-policy.sh
+./update-policy.sh
 ```
 
-### Step 2: Recreate the ConfigMap
+### Method 2: Manual Update
 ```bash
-# Delete the existing ConfigMap
-kubectl delete configmap opa-policies -n opa-policy
-
-# Create a new ConfigMap from your updated file
-kubectl create configmap opa-policies --from-file=access_policy.rego=access_policy.rego -n opa-policy
+# Update the ConfigMap - the reloader will automatically restart the deployment
+kubectl create configmap opa-policies --from-file=access_policy.rego=access_policy.rego -n opa-policy --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-### Step 3: Restart the Deployment
-```bash
-# Restart the OPA deployment to pick up the new policy
-kubectl rollout restart deployment/opa-server -n opa-policy
-```
+### What Happens Automatically:
+1. ✅ **ConfigMap updates** - your policy changes are applied
+2. ✅ **Deployment restarts** - ConfigMap Reloader detects the change
+3. ✅ **New pod starts** - with your updated policy
+4. ✅ **Zero downtime** - seamless policy updates
 
-### Step 4: Verify the Update
+### Verify the Update:
 ```bash
 # Check that the new pod is running
 kubectl get pods -n opa-policy
@@ -69,31 +73,7 @@ kubectl logs -n opa-policy deployment/opa-server
 
 # Test your updated policy
 kubectl port-forward -n opa-policy svc/opa-service 8181:8181
-# Then test with curl commands (see Testing section below)
 ```
-
-### Quick Update Script
-You can also create a simple script to automate the update process:
-
-```bash
-#!/bin/bash
-# update-policy.sh
-echo "Updating OPA policy..."
-
-# Delete existing ConfigMap
-kubectl delete configmap opa-policies -n opa-policy
-
-# Create new ConfigMap from file
-kubectl create configmap opa-policies --from-file=access_policy.rego=access_policy.rego -n opa-policy
-
-# Restart deployment
-kubectl rollout restart deployment/opa-server -n opa-policy
-
-echo "Policy update complete! Check pod status with: kubectl get pods -n opa-policy"
-```
-
-Make it executable: `chmod +x update-policy.sh`
-Then run: `./update-policy.sh`
 
 ## Testing the Deployment
 
@@ -138,11 +118,13 @@ Adjust these in `k8s/deployment.yaml` as needed.
 To remove the deployment:
 
 ```bash
+# Remove the reloader
+helm uninstall reloader -n opa-policy
+
+# Remove the deployment
 kubectl delete configmap opa-policies -n opa-policy
 kubectl delete -k k8s/
 ```
-
-Or delete individual resources through the Rancher UI.
 
 ## Troubleshooting
 
@@ -161,10 +143,16 @@ Or delete individual resources through the Rancher UI.
    kubectl get configmap opa-policies -n opa-policy -o yaml
    ```
 
+4. **Check reloader status:**
+   ```bash
+   kubectl get pods -n opa-policy -l app=reloader
+   ```
+
 ## Differences from Docker Compose
 
 - **Persistence**: Policies are stored in ConfigMaps instead of mounted files
 - **Scaling**: Can scale horizontally with multiple replicas
 - **Networking**: Uses Kubernetes services and ingress instead of direct port mapping
 - **Resource Management**: Includes resource requests and limits
-- **High Availability**: Can be deployed across multiple nodes 
+- **High Availability**: Can be deployed across multiple nodes
+- **Seamless Updates**: Automatic policy reloading with ConfigMap Reloader 

@@ -5,6 +5,9 @@ metadata:
   namespace: opa-policy
   labels:
     app: opa-server
+  annotations:
+    reloader.stakater.com/auto: "true"
+    reloader.stakater.com/search: "opa-policies"
 spec:
   replicas: 1
   selector:
