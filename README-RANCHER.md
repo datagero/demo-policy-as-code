@@ -12,22 +12,88 @@ This guide explains how to deploy and run the Open Policy Agent (OPA) project in
 
 ### Option 1: Using kubectl (Command Line)
 
-1. **Deploy to Kubernetes cluster:**
+1. **Create the ConfigMap from your policy file:**
+   ```bash
+   kubectl create configmap opa-policies --from-file=access_policy.rego=access_policy.rego -n opa-policy
+   ```
+
+2. **Deploy the remaining Kubernetes resources:**
    ```bash
    kubectl apply -k k8s/
    ```
 
-2. **Verify deployment:**
+3. **Verify deployment:**
    ```bash
    kubectl get all -n opa-policy
    kubectl get pods -n opa-policy
    ```
 
-3. **Access the service:**
+4. **Access the service:**
    ```bash
    # Port forward to access locally
    kubectl port-forward -n opa-policy svc/opa-service 8181:8181
    ```
+
+## Updating the OPA Policy
+
+When you need to modify your policy rules, follow these steps:
+
+### Step 1: Edit Your Policy File
+```bash
+# Edit the access_policy.rego file with your changes
+# Example: Add new rules, modify existing logic, etc.
+```
+
+### Step 2: Recreate the ConfigMap
+```bash
+# Delete the existing ConfigMap
+kubectl delete configmap opa-policies -n opa-policy
+
+# Create a new ConfigMap from your updated file
+kubectl create configmap opa-policies --from-file=access_policy.rego=access_policy.rego -n opa-policy
+```
+
+### Step 3: Restart the Deployment
+```bash
+# Restart the OPA deployment to pick up the new policy
+kubectl rollout restart deployment/opa-server -n opa-policy
+```
+
+### Step 4: Verify the Update
+```bash
+# Check that the new pod is running
+kubectl get pods -n opa-policy
+
+# Check the logs to ensure no errors
+kubectl logs -n opa-policy deployment/opa-server
+
+# Test your updated policy
+kubectl port-forward -n opa-policy svc/opa-service 8181:8181
+# Then test with curl commands (see Testing section below)
+```
+
+### Quick Update Script
+You can also create a simple script to automate the update process:
+
+```bash
+#!/bin/bash
+# update-policy.sh
+echo "Updating OPA policy..."
+
+# Delete existing ConfigMap
+kubectl delete configmap opa-policies -n opa-policy
+
+# Create new ConfigMap from file
+kubectl create configmap opa-policies --from-file=access_policy.rego=access_policy.rego -n opa-policy
+
+# Restart deployment
+kubectl rollout restart deployment/opa-server -n opa-policy
+
+echo "Policy update complete! Check pod status with: kubectl get pods -n opa-policy"
+```
+
+Make it executable: `chmod +x update-policy.sh`
+Then run: `./update-policy.sh`
 
 ## Testing the Deployment
 
@@ -51,20 +117,6 @@ Once deployed, you can test the OPA service:
 
 ## Configuration
 
-### Updating Policies
-
-To update the OPA policies:
-
-1. **Edit the ConfigMap:**
-   ```bash
-   kubectl edit configmap opa-policies -n opa-policy
-   ```
-
-2. **Restart the deployment:**
-   ```bash
-   kubectl rollout restart deployment/opa-server -n opa-policy
-   ```
-
 ### Scaling
 
 To scale the OPA service:
@@ -86,6 +138,7 @@ Adjust these in `k8s/deployment.yaml` as needed.
 To remove the deployment:
 
 ```bash
+kubectl delete configmap opa-policies -n opa-policy
 kubectl delete -k k8s/
 ```
 
