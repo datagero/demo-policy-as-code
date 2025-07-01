@@ -37,7 +37,13 @@ This guide explains how to deploy and run the Open Policy Agent (OPA) project in
 
 5. **Access the service:**
    ```bash
-   # Port forward to access locally
+   # Option 1: NodePort (Recommended - no port-forwarding needed)
+   curl http://localhost:30081/v1/policies
+   
+   # Option 2: Persistent port-forward script
+   ./port-forward.sh
+   
+   # Option 3: Manual port-forward
    kubectl port-forward -n opa-policy svc/opa-service 8181:8181
    ```
 
@@ -79,21 +85,34 @@ kubectl port-forward -n opa-policy svc/opa-service 8181:8181
 
 Once deployed, you can test the OPA service:
 
-1. **Port forward to access the service:**
-   ```bash
-   kubectl port-forward -n opa-policy svc/opa-service 8181:8181
-   ```
+### Option 1: NodePort (Recommended - No Port-Forwarding)
+```bash
+# Check if policies are loaded
+curl http://localhost:30081/v1/policies
 
-2. **Test the API endpoints:**
-   ```bash
-   # Check if policies are loaded
-   curl http://localhost:8181/v1/policies
-   
-   # Test with input data
-   curl -X POST --data-binary @input.json \
-     'http://localhost:8181/v1/data/example/allow_access' \
-     -H 'Content-Type: application/json'
-   ```
+# Test with input data
+curl -X POST --data-binary @input.json \
+  'http://localhost:30081/v1/data/example/allow_access' \
+  -H 'Content-Type: application/json'
+```
+
+### Option 2: Persistent Port-Forward
+```bash
+# Start persistent port-forward (auto-reconnects)
+./port-forward.sh
+
+# Then test with localhost:8181
+curl http://localhost:8181/v1/policies
+```
+
+### Option 3: Manual Port-Forward
+```bash
+# Port forward to access the service
+kubectl port-forward -n opa-policy svc/opa-service 8181:8181
+
+# Then test with localhost:8181
+curl http://localhost:8181/v1/policies
+```
 
 ## Configuration
 
