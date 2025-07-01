@@ -13,4 +13,6 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: opa-server 
+    app: opa-server
+    app.kubernetes.io/name: opa-policy
+    app.kubernetes.io/instance: opa-policy 

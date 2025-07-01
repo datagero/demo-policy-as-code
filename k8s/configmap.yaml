@@ -9,11 +9,4 @@ data:
 
     default allow_access = false
 
-    allow_access {
-        input.user.role == "admin"
-    }
-
-    allow_access {
-        input.user.role == "user"
-        input.resource.type == "document"
-    } 
+    allow_access if input.age >= 18
