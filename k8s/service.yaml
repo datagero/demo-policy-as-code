@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa-service
+  namespace: opa-policy
+  labels:
+    app: opa-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8181
+    targetPort: 8181
+    protocol: TCP
+    name: http
+  selector:
+    app: opa-server 

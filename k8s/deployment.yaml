@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa-server
+  namespace: opa-policy
+  labels:
+    app: opa-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opa-server
+  template:
+    metadata:
+      labels:
+        app: opa-server
+    spec:
+      containers:
+      - name: opa
+        image: openpolicyagent/opa:latest
+        ports:
+        - containerPort: 8181
+        command:
+        - opa
+        - run
+        - --server
+        - --addr=:8181
+        - /policies
+        volumeMounts:
+        - name: policies-volume
+          mountPath: /policies
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+      volumes:
+      - name: policies-volume
+        configMap:
+          name: opa-policies 

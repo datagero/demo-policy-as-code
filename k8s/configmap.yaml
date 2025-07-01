@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opa-policies
+  namespace: opa-policy
+data:
+  access_policy.rego: |
+    package example
+
+    default allow_access = false
+
+    allow_access {
+        input.user.role == "admin"
+    }
+
+    allow_access {
+        input.user.role == "user"
+        input.resource.type == "document"
+    } 
