@@ -17,8 +17,7 @@
           "name": "customer_model",
           "columns": [
             {
-              "name": "fail_only",
-              "column_security_role": "FOO_PII_NAME"
+              "name": "fail_only"
             }
           ]
         }
