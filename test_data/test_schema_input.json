@@ -22,6 +22,14 @@
               "column_security_role": "FOO_PII_EMAIL"
             },
             {
+              "name": "invalid_role_field",
+              "column_security_role": "INVALID_ROLE"
+            },
+            {
+              "name": "another_bad_field",
+              "column_security_role": "BAD_PREFIX_ROLE"
+            },
+            {
               "name": "non_sensitive_field"
             }
           ]

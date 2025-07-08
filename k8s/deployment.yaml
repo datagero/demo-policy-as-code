@@ -28,8 +28,7 @@ spec:
         - run
         - --server
         - --addr=:8181
-        - --ignore=.*\\.\\..*
-        - --ignore=.*\\.data.*
+        - "--ignore=.*"
         - /policies
         volumeMounts:
         - name: policies-volume

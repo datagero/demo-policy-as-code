@@ -18,15 +18,20 @@ This project enables organizations to automate and enforce data governance rules
    cd policy-as-code
    ```
 
-2. **Deploy OPA and example policy to Kubernetes:**
+2. **Deploy OPA and all policies to Kubernetes:**
    ```bash
    kubectl apply -f k8s/namespace.yaml
-   kubectl create configmap opa-policies --from-file=access_policy.rego=policies/access_policy.rego -n opa-policy
+   kubectl create configmap opa-policies \
+     --from-file=access_policy.rego=policies/access_policy.rego \
+     --from-file=cross_validation_policy.rego=policies/cross_validation_policy.rego \
+     --from-file=governance_policy.rego=policies/governance_policy.rego \
+     --from-file=schema_policy.rego=policies/schema_policy.rego \
+     -n opa-policy
    kubectl apply -k k8s/
    ./scripts/install-reloader.sh   # Optional: for auto-reloading policies
    ```
 
-3. **Test the policy:**
+3. **Test the basic access policy:**
    ```bash
    curl -X POST --data-binary @test_data/input.json \
      'http://localhost:30081/v1/data/example/allow_access' \
@@ -42,7 +47,7 @@ Validates that data product schemas comply with governance mappings:
 ```bash
 # Test cross-validation scenarios
 curl -X POST --data-binary @test_data/test_cross_validation_input.json \
-  'http://localhost:30081/v1/data/cross/validation/fail_missing' \
+  'http://localhost:30081/v1/data/cross/validation/fail_mismatch' \
   -H 'Content-Type: application/json'
 ```
 
@@ -98,6 +103,18 @@ policy-as-code/
 ├── scripts/         # Helper scripts
 ├── k8s/             # Kubernetes manifests
 └── README.md
+```
+
+## Cleanup
+
+To remove all resources and start fresh:
+
+```bash
+# Remove ConfigMap Reloader (if installed)
+helm uninstall reloader -n opa-policy
+kubectl delete -k k8s/
+kubectl delete configmap opa-policies -n opa-policy
+kubectl delete namespace opa-policy
 ```
 
 ## Need Rancher/Kubernetes Setup?
